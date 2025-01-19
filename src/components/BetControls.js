@@ -4,42 +4,36 @@ import { GameContext } from '../context/GameContext';
 function BetControls() {
   const {
     balance,
-    currentBet,
+    pendingBet,
     placeBet,
     clearBet,
     dealCards,
     gameStatus
   } = useContext(GameContext);
 
+  // Only allow bet/clear/deal if gameStatus is "idle"
   const isIdle = (gameStatus === 'idle');
 
   return (
     <div style={{ border: '1px solid gray', padding: '1rem', marginBottom: '1rem' }}>
       <h3>Bet Controls</h3>
       <p>Balance: {balance}</p>
-      <p>Current Bet: {currentBet}</p>
+      <p>Pending Bet: {pendingBet}</p>
 
-      {/* Bet 10 button, disabled if not idle */}
-      <button
-        onClick={() => placeBet(10)}
-        disabled={!isIdle}
-      >
+      <button onClick={() => placeBet(10)} disabled={!isIdle}>
         Bet 10
       </button>
-
-      {/* "Deal" is enabled only if we have a non-zero currentBet AND we are idle */}
-      <button
-        onClick={dealCards}
-        disabled={currentBet === 0 || !isIdle}
-      >
-        Deal
+      <button onClick={() => placeBet(50)} disabled={!isIdle}>
+        Bet 50
+      </button>
+      <button onClick={() => placeBet(100)} disabled={!isIdle}>
+        Bet 100
       </button>
 
-      {/* Clear Bet button disabled if not idle */}
-      <button
-        onClick={clearBet}
-        disabled={!isIdle}
-      >
+      <button onClick={dealCards} disabled={!isIdle || pendingBet === 0}>
+        Deal
+      </button>
+      <button onClick={clearBet} disabled={!isIdle || pendingBet === 0}>
         Clear Bet
       </button>
     </div>

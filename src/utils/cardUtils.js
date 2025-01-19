@@ -1,5 +1,6 @@
-// src/utils/cardUtils.js
-
+/**
+ * Utility file for deck creation, shuffling, and calculating hand values.
+ */
 export function createDeck() {
     const suits = ['♠', '♥', '♦', '♣'];
     const ranks = [
@@ -40,8 +41,7 @@ export function createDeck() {
   }
   
   /**
-   * calculateHandValue - sums up card values.
-   * Aces start as 11, then reduce to 1 if over 21.
+   * calculateHandValue - sums up card values, handling Aces as 11 or 1 if necessary.
    */
   export function calculateHandValue(hand) {
     let total = 0;
@@ -56,7 +56,7 @@ export function createDeck() {
   
     // Reduce Aces from 11 to 1 while total > 21
     while (total > 21 && aceCount > 0) {
-      total -= 10; // subtract 10 for each Ace that goes from 11 -> 1
+      total -= 10;
       aceCount--;
     }
   
