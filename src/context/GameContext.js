@@ -44,6 +44,11 @@ export function GameContextProvider({ children }) {
   // A string that displays the current status or instructions in the UI
   const [statusMessage, setStatusMessage] = useState('');
 
+  // <<< ADDED: A tiny helper to create delays for the dealer’s reveal/draw
+  function wait(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
   /**********************************************************
    * Betting (pendingBet) Functions
    **********************************************************/
@@ -108,7 +113,7 @@ export function GameContextProvider({ children }) {
     const dealerCard2 = { ...freshDeck.pop(), hidden: true };  // mark hidden
     const newDealerHand = [dealerCard1, dealerCard2];
 
-setDealerHand(newDealerHand);
+    setDealerHand(newDealerHand);
 
     // 4) Set the deck
     setDeck(freshDeck);
@@ -285,6 +290,12 @@ setDealerHand(newDealerHand);
       return;
     }
 
+    // <<< ADDED: Check if we already have 6 total hands
+    if (playerHands.length >= 6) {
+      setStatusMessage('Maximum splits reached (6 total hands).');
+      return;
+    }
+
     const currentHand = playerHands[currentHandIndex];
     if (!currentHand || currentHand.length !== 2) {
       setStatusMessage('Can only split a 2-card hand.');
@@ -345,7 +356,7 @@ setDealerHand(newDealerHand);
    */
   function moveToNextHandOrDealer() {
     const nextIndex = currentHandIndex + 1;
-  
+
     if (nextIndex < playerHands.length) {
       // We still have more hands to play
       setCurrentHandIndex(nextIndex);
@@ -355,9 +366,9 @@ setDealerHand(newDealerHand);
       const allBetsZero = playerBets.every(bet => bet === 0);
       if (allBetsZero) {
         // Reveal dealer card but DO NOT let dealer draw
-        // We'll do that by simply setting gameStatus to 'idle' 
+        // We'll do that by simply setting gameStatus to 'idle'
         // after revealing the second card.
-  
+
         // 1) Reveal the hidden card if it's still hidden:
         const revealedDealerHand = dealerHand.map((card, idx) => {
           if (idx === 1 && card.hidden) {
@@ -366,10 +377,10 @@ setDealerHand(newDealerHand);
           return card;
         });
         setDealerHand(revealedDealerHand);
-  
+
         // 2) Announce that the dealer won't draw because all bets are lost
         setStatusMessage("All player hands busted/lost. Dealer's card revealed. Round over.");
-  
+
         // 3) End the round
         setGameStatus('idle');
       } else {
@@ -379,8 +390,6 @@ setDealerHand(newDealerHand);
       }
     }
   }
-  
-  
 
   /**********************************************************
    * Dealer Turn
@@ -388,12 +397,16 @@ setDealerHand(newDealerHand);
    **********************************************************/
   useEffect(() => {
     if (gameStatus === 'dealerTurn') {
-      dealerPlay();
+      // <<< ADDED: Make it async so we can await delays
+      (async () => {
+        await dealerPlay();
+      })();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameStatus]);
-  
-  function dealerPlay() {
+
+  // <<< ADDED: Mark dealerPlay async to allow await
+  async function dealerPlay() {
     // First, reveal the hidden card (if any):
     let revealedDealerHand = dealerHand.map((card, idx) => {
       if (idx === 1 && card.hidden) {
@@ -401,32 +414,39 @@ setDealerHand(newDealerHand);
       }
       return card;
     });
-  
+
+    // <<< ADDED: Update state & pause to simulate "revealing" moment
+    setDealerHand(revealedDealerHand);
+    setStatusMessage("Dealer reveals the hidden card...");
+    await wait(1000);
+
     // Now check if all bets are zero before drawing
     const allBetsZero = playerBets.every(bet => bet === 0);
-  
+
     if (allBetsZero) {
       // Skip drawing, just show the second card
-      setDealerHand(revealedDealerHand);
       setStatusMessage("All player hands busted. Dealer reveals card but doesn't draw. Round over.");
       setGameStatus('idle');
       return; // **Important**: do not proceed further
     }
-  
+
     // Otherwise, proceed with normal dealer logic
     let newDeck = [...deck];
     let dealerVal = calculateHandValue(revealedDealerHand);
-  
+
     // Dealer draws until 17 or bust
     while (dealerVal < 17 && newDeck.length > 0) {
       const card = newDeck.pop();
       revealedDealerHand.push(card);
       dealerVal = calculateHandValue(revealedDealerHand);
+
+      // <<< ADDED: Update & pause each time the dealer draws
+      setDeck(newDeck);
+      setDealerHand([...revealedDealerHand]);
+      setStatusMessage(`Dealer draws a card. Dealer total is now ${dealerVal}.`);
+      await wait(1000);
     }
-  
-    setDeck(newDeck);
-    setDealerHand(revealedDealerHand);
-  
+
     // Then compare each hand individually
     let finalMessage = '';
     for (let i = 0; i < playerHands.length; i++) {
@@ -441,7 +461,7 @@ setDealerHand(newDealerHand);
         continue;
       }
       const playerVal = calculateHandValue(hand);
-  
+
       if (dealerVal > 21) {
         finalMessage += `Hand ${i + 1} wins! Dealer busted with ${dealerVal}.\n`;
         setBalance(prev => prev + bet * 2);
@@ -457,7 +477,7 @@ setDealerHand(newDealerHand);
         }
       }
     }
-  
+
     // End round
     setPlayerBets(playerBets.map(() => 0)); // zero out all bets
     setStatusMessage(finalMessage.trim() || 'Round over.');
