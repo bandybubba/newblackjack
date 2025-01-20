@@ -5,6 +5,7 @@ import DealerHand from './components/DealerHand';
 import PlayerHands from './components/PlayerHands';
 import ActionButtons from './components/ActionButtons';
 import StatusMessage from './components/StatusMessage';
+import './DarkTheme.css'; 
 
 
 // REMOVED old inline styling from the return

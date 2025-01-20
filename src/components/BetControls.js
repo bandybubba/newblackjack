@@ -1,3 +1,4 @@
+// BetControls.js
 import React, { useContext } from 'react';
 import { GameContext } from '../context/GameContext';
 
@@ -11,29 +12,36 @@ function BetControls() {
     gameStatus
   } = useContext(GameContext);
 
-  // Only allow bet/clear/deal if gameStatus is "idle"
   const isIdle = (gameStatus === 'idle');
 
   return (
-    <div style={{ border: '1px solid gray', padding: '1rem', marginBottom: '1rem' }}>
-      <h3>Bet Controls</h3>
-      <p>Balance: {balance}</p>
-      <p>Pending Bet: {pendingBet}</p>
+    <div className="panel">
+      <h3>Place Your Bet</h3>
+      <p className="label-gold">Balance: ${balance}</p>
+      <p className="label-gold">Current Bet: ${pendingBet}</p>
 
-      <button onClick={() => placeBet(10)} disabled={!isIdle}>
-        Bet 10
-      </button>
-      <button onClick={() => placeBet(50)} disabled={!isIdle}>
-        Bet 50
-      </button>
-      <button onClick={() => placeBet(100)} disabled={!isIdle}>
-        Bet 100
-      </button>
+      <div style={{ marginBottom: '1rem' }}>
+        <button className="dark-btn" onClick={() => placeBet(5)} disabled={!isIdle}>
+          $5
+        </button>
+        <button className="dark-btn" onClick={() => placeBet(10)} disabled={!isIdle}>
+          $10
+        </button>
+        <button className="dark-btn" onClick={() => placeBet(25)} disabled={!isIdle}>
+          $25
+        </button>
+        <button className="dark-btn" onClick={() => placeBet(50)} disabled={!isIdle}>
+          $50
+        </button>
+        <button className="dark-btn" onClick={() => placeBet(100)} disabled={!isIdle}>
+          $100
+        </button>
+      </div>
 
-      <button onClick={dealCards} disabled={!isIdle || pendingBet === 0}>
-        Deal
+      <button className="dark-btn" onClick={dealCards} disabled={!isIdle || pendingBet === 0}>
+        Confirm Wager
       </button>
-      <button onClick={clearBet} disabled={!isIdle || pendingBet === 0}>
+      <button className="dark-btn" onClick={clearBet} disabled={!isIdle || pendingBet === 0}>
         Clear Bet
       </button>
     </div>

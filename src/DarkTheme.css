@@ -1,0 +1,83 @@
+/* DarkTheme.css */
+
+/* Base reset or minimal styling */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Body with dark background */
+body {
+  background-color: #1b1b1b; /* Deep dark gray */
+  color: #f2f2f2; /* Off-white text */
+  font-family: sans-serif;
+  padding: 1rem;
+}
+
+/* Main container if you want to center everything */
+.app-container {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+/* Title styling (like "Blackjack Simulator") */
+.app-title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #d4a247; /* Goldish color */
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+/* Panels (the boxes around Dealer, Player, etc.) */
+.panel {
+  background-color: #2c2c2c; 
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* Panel headings (like "Dealer", "Player") */
+.panel h3 {
+  color: #d4a247; /* gold color */
+  margin-bottom: 0.5rem;
+}
+
+/* Buttons with green background & gold text */
+.dark-btn {
+  background-color: #2e7d32; /* green */
+  color: #f2f2f2; /* off-white or gold if you like */
+  border: none;
+  padding: 0.5rem 1rem;
+  margin-right: 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+/* Hover effect */
+.dark-btn:hover {
+  background-color: #3e8d42; /* slightly lighter green */
+}
+
+/* Disabled button styling */
+.dark-btn:disabled {
+  background-color: #444;
+  cursor: not-allowed;
+}
+
+/* A special gold text color for labels, etc. */
+.label-gold {
+  color: #d4a247;
+}
+
+/* Align right for certain items (like "Current Bet: $0") */
+.text-right {
+  text-align: right;
+}
+
+/* Slight spacing for text */
+.mb-1 {
+  margin-bottom: 1rem;
+}
