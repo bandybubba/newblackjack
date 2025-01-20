@@ -141,54 +141,55 @@ export function GameContextProvider({ children }) {
    *   - If only dealer => lose
    **********************************************************/
   useEffect(() => {
+    // We only run this right after the initial deal:
     if (
-        gameStatus === 'playerTurn' &&
-        playerHands.length === 1 &&        // Only if we have exactly 1 hand
-        playerHands[0].length === 2 &&     // The first hand has exactly 2 cards
-        dealerHand.length === 2
-      ) {
-        checkImmediateBlackjack();
+      gameStatus === 'playerTurn' &&
+      playerHands.length === 1 &&
+      playerHands[0].length === 2 &&
+      dealerHand.length === 2
+    ) {
+      // Inline the logic from checkImmediateBlackjack here:
+      const firstHand = playerHands[0] || [];
+      const dealerVal = calculateHandValue(dealerHand);
+      const playerVal = calculateHandValue(firstHand);
+  
+      const isPlayerBJ = (playerVal === 21 && firstHand.length === 2);
+      const isDealerBJ = (dealerVal === 21 && dealerHand.length === 2);
+  
+      if (isPlayerBJ || isDealerBJ) {
+        const theBets = [...playerBets];
+        const initialBet = theBets[0];
+  
+        if (isPlayerBJ && isDealerBJ) {
+          setStatusMessage('Push! Both have Blackjack.');
+          setBalance(prev => prev + initialBet);
+        } else if (isPlayerBJ) {
+          setStatusMessage('Blackjack! You win 3:2 payout!');
+          const blackjackPayout = initialBet + Math.floor(initialBet * 1.5);
+          setBalance(prev => prev + blackjackPayout);
+        } else if (isDealerBJ) {
+          setStatusMessage('Dealer has Blackjack! You lose.');
+        }
+        theBets[0] = 0;
+        setPlayerBets(theBets);
+  
+        setGameStatus('idle');
+      } else {
+        setStatusMessage('Your turn! Hit, Stand, or Double?');
       }
-    }, [gameStatus, playerHands, dealerHand]);
-
-  function checkImmediateBlackjack() {
-    // Only checking the first hand for immediate blackjack
-    // If you want to allow splitted hands to also be "natural blackjack,"
-    // that’s a separate rule. Commonly, only the very first 2-card hand can be a natural BJ.
-    const firstHand = playerHands[0] || [];
-    const dealerVal = calculateHandValue(dealerHand);
-    const playerVal = calculateHandValue(firstHand);
-
-    const isPlayerBJ = (playerVal === 21 && firstHand.length === 2);
-    const isDealerBJ = (dealerVal === 21 && dealerHand.length === 2);
-
-    if (isPlayerBJ || isDealerBJ) {
-      // We'll modify playerBets[0] if needed
-      const theBets = [...playerBets];
-      const initialBet = theBets[0];
-
-      if (isPlayerBJ && isDealerBJ) {
-        setStatusMessage('Push! Both have Blackjack.');
-        // Return the bet to balance
-        setBalance(prev => prev + initialBet);
-      } else if (isPlayerBJ) {
-        setStatusMessage('Blackjack! You win 3:2 payout!');
-        const blackjackPayout = initialBet + Math.floor(initialBet * 1.5);
-        setBalance(prev => prev + blackjackPayout);
-      } else if (isDealerBJ) {
-        setStatusMessage('Dealer has Blackjack! You lose.');
-        // Bet is lost
-      }
-      // Zero out the bet for that hand
-      theBets[0] = 0;
-      setPlayerBets(theBets);
-
-      // End round
-      setGameStatus('idle');
-    } else {
-      setStatusMessage('Your turn! Hit, Stand, or Double?');
     }
-  }
+  }, [
+    gameStatus,
+    playerHands,
+    dealerHand,
+    playerBets,       // must include any states/props used in the logic
+    setBalance,
+    setPlayerBets,
+    setStatusMessage,
+    setGameStatus
+  ]);
+  
+
 
   /**********************************************************
    * Player Actions: HIT, STAND, DOUBLE, SPLIT
