@@ -1,9 +1,11 @@
-// DealerHand.js
+// File: src/components/DealerHand.js
+
 import React, { useContext } from 'react';
 import { GameContext } from '../context/GameContext';
+import Card from './Card'; //  <-- IMPORTANT: import our new Card component
 
 function DealerHand() {
-  const { dealerHand } = useContext(GameContext);
+  const { dealerHand, gameStatus } = useContext(GameContext);
 
   return (
     <div className="panel">
@@ -13,9 +15,12 @@ function DealerHand() {
       ) : (
         <div>
           {dealerHand.map((card, idx) => (
-            <span key={idx} style={{ marginRight: '0.5rem' }}>
-              {card.rank}{card.suit}
-            </span>
+            <Card
+              key={idx}
+              rank={card.rank}       // e.g. 'A', 'K', '3', etc.
+              suit={card.suit}       // e.g. '♠', '♦', etc.
+              hidden={card.hidden && gameStatus === 'playerTurn'}
+            />
           ))}
         </div>
       )}

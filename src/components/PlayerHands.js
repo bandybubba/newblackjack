@@ -1,7 +1,9 @@
-// PlayerHands.js
+// File: src/components/PlayerHands.js
+
 import React, { useContext } from 'react';
 import { GameContext } from '../context/GameContext';
 import { calculateHandValue } from '../utils/cardUtils';
+import Card from './Card'; // <-- import our new Card component
 
 function PlayerHands() {
   const {
@@ -29,14 +31,19 @@ function PlayerHands() {
 
         return (
           <div key={handIndex} style={{ marginBottom: '1rem' }}>
-            <strong>Hand {handIndex + 1}</strong> 
+            <strong>Hand {handIndex + 1}</strong>
             {isActive && <span style={{ marginLeft: '1rem', color: 'yellow' }}>ACTIVE</span>}
             <span style={{ marginLeft: '1rem' }}>Bet: {bet}</span>
             <div style={{ marginTop: '0.5rem' }}>
               {hand.map((card, cardIdx) => (
-                <span key={cardIdx} style={{ marginRight: '0.5rem' }}>
-                  {card.rank}{card.suit}
-                </span>
+                <Card
+                  key={cardIdx}
+                  rank={card.rank}
+                  suit={card.suit}
+                  hidden={false} 
+                  // Player's cards usually aren't hidden, 
+                  // but you can pass 'card.hidden' if your logic needs it
+                />
               ))}
             </div>
             <div>Value: {handValue}</div>
